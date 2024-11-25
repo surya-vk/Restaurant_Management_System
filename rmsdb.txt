@@ -1,0 +1,608 @@
+CREATE DATABASE IF NOT EXISTS rmsdb; -- Change to your database name
+
+CREATE TABLE IF NOT EXISTS Menu (
+  item_id VARCHAR(6) PRIMARY KEY,
+  item_name VARCHAR(255),
+  item_type VARCHAR(255),
+  item_category VARCHAR(255),
+  item_price DECIMAL(10, 2),
+  item_description VARCHAR(255)
+);
+
+CREATE TABLE IF NOT EXISTS Accounts (
+  account_id INT PRIMARY KEY AUTO_INCREMENT,
+  email VARCHAR(255),
+  register_date DATE,
+  phone_number VARCHAR(255),
+  password VARCHAR(255)
+);
+
+CREATE TABLE IF NOT EXISTS Staffs (
+  staff_id INT PRIMARY KEY AUTO_INCREMENT,
+  staff_name VARCHAR(255),
+  role VARCHAR(255),
+  account_id INT,
+  FOREIGN KEY (account_id ) REFERENCES Accounts(account_id )
+);
+
+CREATE TABLE IF NOT EXISTS Memberships (
+  member_id INT PRIMARY KEY AUTO_INCREMENT,
+  member_name VARCHAR(255),
+  points INT,
+  account_id INT,
+  FOREIGN KEY (account_id ) REFERENCES Accounts(account_id )
+);
+
+CREATE TABLE IF NOT EXISTS Restaurant_Tables (
+  table_id INT PRIMARY KEY AUTO_INCREMENT,
+  capacity INT,
+  is_available BOOLEAN
+);
+
+
+CREATE TABLE IF NOT EXISTS Table_Availability (
+  availability_id INT PRIMARY KEY AUTO_INCREMENT,
+  table_id INT,
+  reservation_date DATE,
+  reservation_time TIME,
+  status VARCHAR(20),
+  FOREIGN KEY (table_id) REFERENCES Restaurant_Tables(table_id)
+);
+
+CREATE TABLE IF NOT EXISTS Reservations (
+  reservation_id INT PRIMARY KEY AUTO_INCREMENT,
+  customer_name VARCHAR(255),
+  table_id INT,
+  reservation_time TIME,
+  reservation_date DATE,
+  head_count INT,
+  special_request VARCHAR(255),
+  FOREIGN KEY (table_id) REFERENCES Restaurant_Tables(table_id)
+);
+
+
+
+
+CREATE TABLE IF NOT EXISTS card_payments (
+    card_id INT AUTO_INCREMENT PRIMARY KEY,
+    account_holder_name VARCHAR(255) NOT NULL,
+    card_number VARCHAR(16) NOT NULL,
+    expiry_date VARCHAR(7) NOT NULL,
+    security_code VARCHAR(3) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS Bills (
+  bill_id INT PRIMARY KEY AUTO_INCREMENT,
+  staff_id INT,
+  member_id INT,
+  reservation_id INT,
+  table_id INT,
+  card_id INT,
+  payment_method VARCHAR(255),
+  bill_time DATETIME,
+  payment_time DATETIME,
+  FOREIGN KEY (staff_id) REFERENCES Staffs(staff_id),
+  FOREIGN KEY (member_id) REFERENCES Memberships(member_id),
+  FOREIGN KEY (reservation_id) REFERENCES Reservations(reservation_id),
+  FOREIGN KEY (table_id) REFERENCES Restaurant_Tables(table_id),
+  FOREIGN KEY (card_id) REFERENCES card_payments(card_id)
+);
+
+
+
+
+CREATE TABLE IF NOT EXISTS Bill_Items (
+  bill_item_id INT PRIMARY KEY AUTO_INCREMENT,
+  bill_id INT,
+  item_id VARCHAR(6),
+  quantity INT,
+  FOREIGN KEY (bill_id) REFERENCES Bills(bill_id),
+  FOREIGN KEY (item_id) REFERENCES Menu(item_id)
+);
+
+
+CREATE TABLE IF NOT EXISTS Kitchen (
+    kitchen_id INT AUTO_INCREMENT PRIMARY KEY,
+    table_id INT,
+    item_id VARCHAR(6),
+    quantity INT,
+    time_submitted DATETIME,
+    time_ended DATETIME,
+    FOREIGN KEY (table_id) REFERENCES Restaurant_Tables(table_id),
+    FOREIGN KEY (item_id) REFERENCES Menu(item_id)
+);
+
+
+
+
+INSERT INTO Restaurant_Tables (table_id, capacity, is_available)
+VALUES 
+  ('1', '4', 1),
+  ('2', '4', 1),
+  ('3', '4', 1),
+  ('4', '6', 1), 
+  ('5', '6', 1),
+  ('6', '6', 1),
+('7', '6', 1),
+  ('8', '8', 1), 
+  ('9', '8', 1),
+('10','8', 1);
+
+
+INSERT INTO Menu (item_id, item_name, item_type, item_category, item_price, item_description)
+VALUES
+  -- Main Dishes
+  ('MD11', 'Dosa', 'Vegetarian', 'Main Dishes', 120, 'Crispy fermented rice and lentil crepe'),
+  ('MD12', 'Idli', 'Vegetarian', 'Main Dishes', 100, 'Steamed rice cakes served with chutney'),
+  ('MD13', 'Pongal', 'Vegetarian', 'Main Dishes', 130, 'Spiced rice and lentils dish'),
+  ('MD14', 'Chicken Biryani', 'Chicken', 'Main Dishes', 320, 'Fragrant basmati rice with marinated chicken'),
+  ('MD15', 'Vegetable Biryani', 'Vegetarian', 'Main Dishes', 280, 'Spiced rice with assorted vegetables'),
+  ('MD16', 'Kerala Prawn Curry', 'Seafood', 'Main Dishes', 360, 'Prawns cooked in coconut milk and spices'),
+  ('MD17', 'Chettinad Chicken Curry', 'Chicken', 'Main Dishes', 350, 'Spicy chicken curry from Tamil Nadu'),
+  ('MD18', 'Fish Moilee', 'Seafood', 'Main Dishes', 330, 'Fish in a coconut milk sauce from Kerala'),
+  ('MD19', 'Gongura Mutton', 'Mutton', 'Main Dishes', 420, 'Mutton cooked with sorrel leaves from Andhra'),
+  ('MD20', 'Avial', 'Vegetarian', 'Main Dishes', 180, 'Mixed vegetables in coconut and yogurt gravy'),
+  ('MD21', 'Sambar Rice', 'Vegetarian', 'Main Dishes', 150, 'Rice served with lentil and vegetable stew'),
+  ('MD22', 'Egg Curry', 'Egg', 'Main Dishes', 250, 'Eggs in a spicy onion-tomato gravy'),
+  ('MD23', 'Kadala Curry', 'Vegetarian', 'Main Dishes', 200, 'Chickpeas cooked in coconut gravy'),
+  ('MD24', 'Rasam Rice', 'Vegetarian', 'Main Dishes', 160, 'Spicy and tangy tomato lentil soup served with rice'),
+  ('MD25', 'Malabar Chicken Biryani', 'Chicken', 'Main Dishes', 360, 'Fragrant rice dish with spiced chicken from Malabar'),
+  ('MD26', 'Kothu Parotta', 'Vegetarian', 'Main Dishes', 220, 'Chopped parotta mixed with vegetables and spices'),
+  ('MD27', 'Nattu Kozhi Curry', 'Chicken', 'Main Dishes', 400, 'Country chicken cooked with spices'),
+  ('MD28', 'Fish Fry', 'Seafood', 'Main Dishes', 290, 'Marinated fish fried to perfection'),
+  ('MD29', 'Pesarattu', 'Vegetarian', 'Main Dishes', 160, 'Green gram dosa served with chutney'),
+  ('MD30', 'Methi Malai Murg', 'Chicken', 'Main Dishes', 350, 'Chicken in a fenugreek and cream sauce'),
+  ('MD31', 'Andhra Chicken Curry', 'Chicken', 'Main Dishes', 320, 'Spicy Andhra-style chicken curry'),
+  ('MD32', 'Vegetable Korma', 'Vegetarian', 'Main Dishes', 220, 'Mixed vegetables cooked in a rich coconut sauce'),
+  ('MD33', 'Paneer Tikka Masala', 'Vegetarian', 'Main Dishes', 280, 'Paneer pieces in creamy tomato sauce'),
+  ('MD34', 'Chettinad Egg Curry', 'Egg', 'Main Dishes', 250, 'Spicy egg curry from Chettinad'),
+  ('MD35', 'Neyyappam', 'Vegetarian', 'Main Dishes', 140, 'Sweet rice and coconut pancakes'),
+  ('MD36', 'Keralan Sadhya', 'Vegetarian', 'Main Dishes', 400, 'Traditional feast with rice and various curries'),
+  ('MD37', 'Bisi Bele Bath', 'Vegetarian', 'Main Dishes', 180, 'Spicy rice and lentil dish from Karnataka'),
+  ('MD38', 'Prawn Masala', 'Seafood', 'Main Dishes', 340, 'Spicy prawns cooked in a masala gravy'),
+  ('MD39', 'Mutton Curry', 'Mutton', 'Main Dishes', 400, 'Tender mutton in a rich gravy'),
+  ('MD40', 'Methi Thepla', 'Vegetarian', 'Main Dishes', 150, 'Fenugreek flatbread served with yogurt'),
+  ('MD41', 'Thalassery Biryani', 'Rice', 'Main Dishes', 350, 'Famous biryani from Thalassery with fragrant rice'),
+  ('MD42', 'Kadala Curry with Appam', 'Vegetarian', 'Main Dishes', 250, 'Chickpea curry served with rice pancakes'),
+  ('MD43', 'Prawn Vindaloo', 'Seafood', 'Main Dishes', 370, 'Prawns in a spicy vinegar sauce'),
+  ('MD44', 'Mutton Paya', 'Mutton', 'Main Dishes', 450, 'Slow-cooked mutton trotters in a spicy broth'),
+  ('MD45', 'Puliyodarai', 'Vegetarian', 'Main Dishes', 140, 'Tamarind rice with spices'),
+  ('MD46', 'Kerala Style Fish Curry', 'Seafood', 'Main Dishes', 320, 'Fish cooked in a spicy coconut curry'),
+  ('MD47', 'Methi Chicken', 'Chicken', 'Main Dishes', 340, 'Chicken cooked with fenugreek leaves'),
+  ('MD48', 'Vegetable Upma', 'Vegetarian', 'Main Dishes', 130, 'Savory semolina dish with vegetables'),
+  ('MD49', 'Dum Ka Murgh', 'Chicken', 'Main Dishes', 360, 'Slow-cooked chicken in a rich gravy'),
+  ('MD50', 'Thalipeeth', 'Vegetarian', 'Main Dishes', 160, 'Multi-grain flatbread served with chutney'),
+
+  -- Side Dishes
+  ('SD1', 'Curd Rice', 'Vegetarian', 'Side Dishes', 100, 'Rice mixed with yogurt and spices'),
+  ('SD2', 'Kothamalli Chutney', 'Vegetarian', 'Side Dishes', 50, 'Coriander chutney'),
+  ('SD3', 'Coconut Chutney', 'Vegetarian', 'Side Dishes', 40, 'Grated coconut chutney'),
+  ('SD4', 'Tomato Chutney', 'Vegetarian', 'Side Dishes', 40, 'Spicy tomato chutney'),
+  ('SD5', 'Onion Raita', 'Vegetarian', 'Side Dishes', 60, 'Yogurt with onions and spices'),
+  ('SD6', 'Pappadam', 'Vegetarian', 'Side Dishes', 30, 'Crispy lentil wafers'),
+  ('SD7', 'Gobi Manchurian', 'Vegetarian', 'Side Dishes', 150, 'Cauliflower fritters in Indo-Chinese style'),
+  ('SD8', 'Chole Bhature', 'Vegetarian', 'Side Dishes', 160, 'Spicy chickpeas with deep-fried bread'),
+  ('SD9', 'Dhokla', 'Vegetarian', 'Side Dishes', 70, 'Steamed gram flour cake'),
+  ('SD10', 'Biryani Raita', 'Vegetarian', 'Side Dishes', 70, 'Spiced yogurt served with biryani'),
+  ('SD11', 'Methi Thepla', 'Vegetarian', 'Side Dishes', 80, 'Fenugreek flatbread served with pickles'),
+  ('SD12', 'Masala Papad', 'Vegetarian', 'Side Dishes', 40, 'Spiced crispy papad'),
+  ('SD13', 'Paneer Tikka', 'Vegetarian', 'Side Dishes', 200, 'Grilled paneer cubes with spices'),
+  ('SD14', 'Vada', 'Vegetarian', 'Side Dishes', 40, 'Fried lentil donuts'),
+  ('SD15', 'Bhindi Masala', 'Vegetarian', 'Side Dishes', 120, 'Spiced okra stir-fry'),
+  ('SD16', 'Palak Paneer', 'Vegetarian', 'Side Dishes', 180, 'Paneer in spinach gravy'),
+  ('SD17', 'Mixed Vegetable Curry', 'Vegetarian', 'Side Dishes', 150, 'Seasonal vegetables in a mild gravy'),
+  ('SD18', 'Aloo Baingan', 'Vegetarian', 'Side Dishes', 130, 'Eggplant and potato curry'),
+  ('SD19', 'Mushroom Masala', 'Vegetarian', 'Side Dishes', 160, 'Mushrooms cooked in a spicy gravy'),
+  ('SD20', 'Vegetable Pakora', 'Vegetarian', 'Side Dishes', 60, 'Crispy fritters made with vegetables'),
+  ('SD21', 'Dal Makhani', 'Vegetarian', 'Side Dishes', 130, 'Slow-cooked black lentils in creamy sauce'),
+  ('SD22', 'Paneer Butter Masala', 'Vegetarian', 'Side Dishes', 200, 'Paneer cubes in a rich tomato gravy'),
+  ('SD23', 'Kadai Paneer', 'Vegetarian', 'Side Dishes', 180, 'Paneer in a spicy bell pepper gravy'),
+  ('SD24', 'Aloo Gobi', 'Vegetarian', 'Side Dishes', 120, 'Potato and cauliflower curry'),
+  ('SD25', 'Methi Malai Murg', 'Chicken', 'Side Dishes', 220, 'Chicken in creamy fenugreek sauce'),
+
+  -- Drinks
+  ('DR1', 'Masala Chai', 'Hot Beverage', 'Drinks', 50, 'Spiced Indian tea'),
+  ('DR2', 'Filter Coffee', 'Hot Beverage', 'Drinks', 70, 'South Indian filter coffee'),
+  ('DR3', 'Lassi', 'Cold Beverage', 'Drinks', 80, 'Sweet yogurt drink'),
+  ('DR4', 'Mango Lassi', 'Cold Beverage', 'Drinks', 90, 'Yogurt drink with mango pulp'),
+  ('DR5', 'Coconut Water', 'Cold Beverage', 'Drinks', 60, 'Fresh coconut water'),
+  ('DR6', 'Buttermilk', 'Cold Beverage', 'Drinks', 40, 'Churned yogurt drink with spices'),
+  ('DR7', 'Nimbu Pani', 'Cold Beverage', 'Drinks', 40, 'Refreshing lemonade'),
+  ('DR8', 'Sweet Tea', 'Hot Beverage', 'Drinks', 50, 'Tea sweetened with sugar'),
+  ('DR9', 'Hot Chocolate', 'Hot Beverage', 'Drinks', 70, 'Rich hot chocolate drink'),
+  ('DR10', 'Iced Tea', 'Cold Beverage', 'Drinks', 60, 'Chilled tea with flavors'),
+  ('DR11', 'Peach Iced Tea', 'Cold Beverage', 'Drinks', 70, 'Iced tea infused with peach'),
+  ('DR12', 'Tamarind Juice', 'Cold Beverage', 'Drinks', 60, 'Tangy tamarind drink'),
+  ('DR13', 'Cucumber Mint Cooler', 'Cold Beverage', 'Drinks', 70, 'Refreshing cucumber and mint drink'),
+  ('DR14', 'Jaljeera', 'Cold Beverage', 'Drinks', 50, 'Spicy and tangy cumin water'),
+  ('DR15', 'Sweet Coconut Milk', 'Cold Beverage', 'Drinks', 80, 'Coconut milk sweetened with sugar'),
+  ('DR16', 'Kesar Badam Milk', 'Cold Beverage', 'Drinks', 90, 'Almond milk flavored with saffron'),
+  ('DR17', 'Thandai', 'Cold Beverage', 'Drinks', 100, 'Milk with nuts and spices'),
+  ('DR18', 'Mint Lemonade', 'Cold Beverage', 'Drinks', 60, 'Lemonade with mint flavor'),
+  ('DR19', 'Saffron Milk', 'Cold Beverage', 'Drinks', 80, 'Milk flavored with saffron'),
+  ('DR20', 'Lemon Mint Cooler', 'Cold Beverage', 'Drinks', 70, 'Refreshing lemon and mint drink'),
+  ('DR21', 'Rose Milk', 'Cold Beverage', 'Drinks', 90, 'Milk flavored with rose syrup'),
+  ('DR22', 'Cranberry Juice', 'Cold Beverage', 'Drinks', 80, 'Sweet and tangy cranberry drink'),
+  ('DR23', 'Green Tea', 'Hot Beverage', 'Drinks', 50, 'Herbal green tea'),
+  ('DR24', 'Spiced Hot Apple Cider', 'Hot Beverage', 'Drinks', 70, 'Warm spiced apple cider'),
+  ('DR25', 'Berry Smoothie', 'Cold Beverage', 'Drinks', 90, 'Smoothie made with mixed berries'),
+  ('DR26', 'Lemonade', 'Cold Beverage', 'Drinks', 50, 'Classic refreshing lemonade'),
+  ('DR27', 'Chia Seed Drink', 'Cold Beverage', 'Drinks', 70, 'Healthy drink with chia seeds'),
+  ('DR28', 'Watermelon Juice', 'Cold Beverage', 'Drinks', 80, 'Fresh watermelon juice'),
+  ('DR29', 'Cucumber Lemonade', 'Cold Beverage', 'Drinks', 70, 'Refreshing cucumber lemonade'),
+  ('DR30', 'Chili Mango Cooler', 'Cold Beverage', 'Drinks', 80, 'Mango drink with a hint of chili');
+
+
+
+
+
+-- Accounts table
+INSERT INTO Accounts (email, register_date, phone_number, password)
+VALUES ('john@gmail.com', '2023-08-31', '+1234567890', 'password123'),
+       ('susan@gmail.com', '2023-08-30', '+1987654321', 'susanpassword'),
+       ('james@gmail.com', '2023-08-29', '+18887776666', 'jamespass'),
+       ('alice@gmail.com', '2023-08-28', '+15555555555', 'alicepassword'),
+       ('mike@gmail.com', '2023-08-27', '+14444444444', 'mikepass'),
+       ('lisa@gmail.com', '2023-08-26', '+13333333333', 'lisapassword'),
+       ('robert@gmail.com', '2023-08-25', '+12222222222', 'robertpass'),
+       ('emily@gmail.com', '2023-08-24', '+16666666666', 'emilypassword'),
+       ('david@gmail.com', '2023-08-23', '+1993219999', 'davidp321ass'),
+       ('ddwd@gmail.com', '2023-08-23', '+1999999329999', 'davidpa2ss'),
+       ('dadsvawvid@gmail.com', '2023-08-23', '+12234132199', 'david4pass'),
+       ('davdavid@gmail.com', '2023-08-23', '+123239999', 'davidp13ass'),
+       ('davvdasid@gmail.com', '2023-08-23', '+1995324319999', 'david2pass'),
+       ('321david@gmail.com', '2023-08-23', '+1942199999', 'davidpa52ss'),
+	('32avid@gmail.com', '2023-08-23', '+1942193429999', 'da2332ss'),
+	('321da543vid@gmail.com', '2023-08-23', '+1942132199999', 'dav43a52ss'),
+	('3211234avid@gmail.com', '2023-08-23', '+194213599999', '32533pa52ss'),
+	('321543avid@gmail.com', '2023-08-23', '+1942154399999', '754dpa52ss'),
+	('rbsjsd@gmail.com', '2023-08-23', '+131351241239', '41f2s'),
+       ('ol435143ivia@gmail.com', '2023-08-22', '+18888888888', 'oliviapass4215word'),
+    ('robber@gmail.com', '2023-09-01', '+1234567890', 'password123'),
+    ('jean@gmail.com', '2023-09-02', '+2345678901', 'password456'),
+    ('emily@gmail.com', '2023-09-03', '+3456789012', 'password789'),
+    ('robert@gmail.com', '2023-09-04', '+4567890123', 'passwordabc'),
+    ('zoe@gmail.com', '2023-09-05', '+5678901234', 'passworddef'),
+    ('lisa@gmail.com', '2023-09-06', '+6789012345', 'passwordghi'),
+    ('taylor@gmail.com', '2023-09-07', '+7890123456', 'passwordjkl'),
+    ('stephan@gmail.com', '2023-09-08', '+8901234567', 'passwordmno'),
+    ('bruce@gmail.com', '2023-09-09', '+9012345678', 'passwordpqr'),
+    ('jackie@gmail.com', '2023-09-10', '+0123456789', 'passwordstu');
+
+
+-- Staffs table
+INSERT INTO Staffs (staff_name, role, account_id)
+VALUES ('John Smith', 'Waiter', 1),
+       ('Susan Johnson', 'Waiter', 2),
+       ('James Brown', 'Waiter', 3),
+       ('Alice Davis', 'Waiter', 4),
+       ('Mike Wilson', 'Waiter', 5),
+       ('Lisa Martinez', 'Chef', 6),
+       ('Robert Miller', 'Manager', 7),
+       ('Emily Moore', 'Manager', 8),
+       ('David Taylor', 'Chef', 9),
+       ('Olivia Anderson', 'Chef', 10);
+
+
+
+-- Memberships table
+INSERT INTO Memberships (member_name, points,account_id)
+VALUES 
+	('Abbel TuTuTu', 100,11),
+       	('Abignail Downey ', 200,12),
+       	('Jamie Mustafa', 300,13),
+       	('Luke Gun Slinger', 400,14),
+       	('Johny Rings', 500,15),
+       	('Wee Tuu Low', 600,16),
+       	('Sum Ting Wong', 700,17),
+       	('Ho Lee Fuk', 800,18),
+       	('Bang Ding Ow', 900,19),
+       	('Rocky Rocket', 1000,20),	
+	('Robber Hellington', 250, 21),
+  	('Jean Ng', 300, 22),
+  	('Emily Davis', 400, 23),
+  	('Robert Wilson', 550, 24),
+  	('Zoe Chong', 650, 25),
+  	('Lisa Chia', 750, 26),
+  	('Taylor Swift', 900, 27),
+  	('Stephan Curry', 1050, 28),
+  	('Bruce Lee', 1200, 29),
+  	('Jackie Chan', 1350, 30);
+
+
+
+-- Reservations table
+INSERT INTO Reservations (reservation_id, customer_name, table_id, reservation_time, reservation_date, head_count, special_request)
+VALUES 
+(2220231, 'Abbel Tu Far Behind', 1, '22:00:34', '2023-09-28', 1, 'Prepare Panadol for me'),
+(2220232, 'Abignaile Lin Downney Jr', 2, '22:00:34', '2023-09-29', 1, 'Default Special Request'),
+(1920233, 'Jamie Mustafa', 3, '19:30:00', '2023-09-30', 2, 'Vegan options needed'),
+(2020234, 'Luke Gun Slinger', 4, '20:00:00', '2023-09-30', 3, 'Birthday celebration'),
+(1920235, 'Johny Rings', 5, '19:45:00', '2023-10-01', 2, 'Quiet corner, please'),
+(1820237, 'Jean Ng', 7, '18:30:00', '2023-10-03', 2, 'Allergies: peanuts'),
+(1920239, 'Taylor Swift', 9, '19:15:00', '2023-10-05', 2, 'Surprise dessert for anniversary'),
+(1111111, 'Default', 9, '19:15:00', '2023-10-05', 2, 'Description'),
+(14202310, 'Bruce Lee', 10, '14:45:00', '2023-10-06', 3, 'Window seat, if available');
+
+INSERT INTO card_payments (card_id, account_holder_name, card_number, expiry_date, security_code)
+VALUES
+('1', 'John Smith', '1234567890123456', '10/15', '123'),
+('2', 'Susan Johnson', '2345678901234567', '10/24', '456'),
+('3', 'James Brown', '3456789012345678', '09/30', '789'),
+('4', 'Alice Davis', '4567890123456789', '09/28', '321'),
+('5', 'Mike Wilson', '5678901234567890', '09/29', '654'),
+('6', 'Robert Miller', '7890123456789012', '10/19', '123'),
+('7', 'Abbel TuTuTu', '1234123412341234', '10/25', '654'),
+('8', 'Abignail Downey', '2345234523452345', '10/24', '987'),
+('9', 'Jamie Mustafa', '3456345634563456', '09/23', '123'),
+('10', 'Luke Gun Slinger', '4567456745674567', '09/22', '456');
+
+INSERT INTO Bills (staff_id, member_id, reservation_id, table_id, card_id, payment_method, bill_time, payment_time)
+VALUES
+(1, 1, 2220231, 1, 1, 'Card', '2023-09-28 22:45:00', '2023-09-28 22:50:00'),
+(1, 5, NULL, 5, NULL, 'Cash', '2023-09-28 19:00:00', '2023-09-28 19:05:00'),
+(1, 2, 2220232, 2, 2, 'Card', '2023-09-29 22:45:00', '2023-09-29 22:50:00'),
+(2, 3, 1920233, 3, NULL, 'Cash', '2023-09-30 20:15:00', '2023-09-30 20:20:00'), 
+(2, 4, 2020234, 4, 3, 'Card', '2023-09-30 20:30:00', '2023-09-30 20:35:00'),
+(2, 8, NULL, 6, NULL, 'Cash', '2023-09-30 20:15:00', '2023-09-30 20:20:00'),
+(3, 5, 1920235, 5, NULL, 'Cash', '2023-10-01 20:15:00', '2023-10-01 20:20:00'), 
+(3, 6, NULL, 7, NULL, 'Cash', '2023-10-01 19:00:00', '2023-10-01 19:05:00'),
+(3, 18, NULL, 2, NULL, 'Cash', '2023-10-01 18:30:00', '2023-10-01 18:35:00'),
+(4, 7, NULL, 9, NULL, 'Cash', '2023-10-02 19:30:00', '2023-10-02 19:35:00'), 
+(4, 17, NULL, 8, NULL, 'Cash', '2023-10-02 20:00:00', '2023-10-02 20:05:00'),
+(4, 8, NULL, 10, 4, 'Card', '2023-10-02 19:00:00', '2023-10-02 19:05:00'),
+(5, 9, 1820237, 6, 5, 'Card', '2023-10-03 18:45:00', '2023-10-03 18:50:00'),
+(5, 16, NULL, 9, NULL, 'Cash', '2023-10-03 19:45:00', '2023-10-03 19:50:00'),
+(5, 10, NULL, 5, NULL, 'Cash', '2023-10-03 20:00:00', '2023-10-03 20:05:00'), 
+(6, 11, NULL, 4, 6, 'Card', '2023-10-03 20:15:00', '2023-10-03 20:20:00'),
+(6, 8, NULL, 10, NULL, 'Cash', '2023-10-03 20:30:00', '2023-10-03 20:35:00'),
+(6, 12, NULL, 3, 7, 'Card', '2023-10-04 19:30:00', '2023-10-04 19:35:00'),
+(7, 13, NULL, 2, NULL, 'Cash', '2023-10-04 19:15:00', '2023-10-04 19:20:00'), 
+(7, 14, 1920239, 1, NULL, 'Cash', '2023-10-05 20:30:00', '2023-10-05 20:35:00'),
+(7, 1, NULL, 6, NULL, 'Cash', '2023-10-05 14:00:00', '2023-10-05 14:05:00'),
+(8, 15, NULL, 8, 8, 'Card', '2023-10-05 20:45:00', '2023-10-05 20:50:00'),
+(8, 16, NULL, 7, NULL, 'Cash', '2023-10-05 20:00:00', '2023-10-05 20:05:00'), 
+(8, 2, NULL, 9, NULL, 'Cash', '2023-10-05 19:30:00', '2023-10-05 19:35:00'),
+(8, 9, NULL, 4, NULL, 'Cash', '2023-10-05 20:15:00', '2023-10-05 20:20:00'),
+(9, 17, NULL, 9, 9, 'Card', '2023-10-05 12:00:00', '2023-10-05 12:05:00'),
+(9, 18, NULL, 10, 10, 'Card', '2023-10-06 13:15:00', '2023-10-06 13:20:00'),
+(9, 19, 14202310, 8, NULL, 'Cash', '2023-10-06 14:30:00', '2023-10-06 14:35:00'),
+(10, 7, NULL, 10, NULL, 'Cash', '2023-10-06 10:45:00', '2023-10-06 10:50:00'), 
+(10, 20, NULL, 6, NULL, 'Cash', '2023-10-06 14:45:00', '2023-10-06 14:50:00');
+
+
+
+INSERT INTO Bill_Items (bill_id, item_id, quantity)
+VALUES 
+(1, 'MD1', 2),
+(1, 'MD15', 1),
+(1, 'S3', 2),
+(1, 'L1', 1),
+
+(2, 'MD2', 1),
+(2, 'MD5', 2),
+(2, 'MD16', 1),
+(2, 'S5', 2),
+(2, 'L2', 1),
+(2, 'HC2', 2),
+
+(3, 'MD19', 1),
+(3, 'MD2', 1),
+(3, 'MD4', 1),
+(3, 'S6', 2),
+(3, 'L3', 1),
+(3, 'HC3', 2),
+
+(4, 'MD23', 1),
+(4, 'MD9', 1),
+(4, 'L2', 2),
+(4, 'C3', 1),
+(4, 'HC4', 2),
+
+(5, 'MD23', 1),
+(5, 'S1', 1),
+(5, 'S8', 2),
+(5, 'L5', 1),
+(5, 'HC5', 2),
+
+(6, 'MD23', 1),
+(6, 'MD21', 1),
+(6, 'C1', 1),
+(6, 'C2', 2),
+
+(7, 'MD23', 1),
+(7, 'S1', 1),
+(7, 'S4', 1),
+(7, 'C3', 1),
+(7, 'C4', 2),
+
+(8, 'MD23', 1),
+(8, 'L2', 1),
+(8, 'C3', 1),
+(8, 'L5', 1),
+(8, 'C4', 2),
+(8, 'M1', 1),
+(8, 'M2', 2),
+
+(9, 'MD23', 1),
+(9, 'M1', 1),
+(9, 'M4', 1),
+(9, 'M2', 1),
+(9, 'M5', 2),
+(9, 'M6', 1),
+(9, 'HD1', 2),
+
+(10, 'SK3', 1),
+(10, 'SK6', 1),
+(10, 'CP1', 1),
+(10, 'CP2', 1),
+(10, 'CP3', 2),
+(10, 'CP4', 1),
+(10, 'CP5', 2),
+
+(11, 'MD1', 2),
+(11, 'MD15', 1),
+(11, 'S3', 2),
+(11, 'L1', 1),
+
+(12, 'MD2', 1),
+(12, 'MD5', 2),
+(12, 'MD16', 1),
+(12, 'S5', 2),
+(12, 'L2', 1),
+(12, 'HC2', 2),
+
+(13, 'MD19', 1),
+(13, 'MD2', 1),
+(13, 'MD4', 1),
+(13, 'S6', 2),
+(13, 'L3', 1),
+(13, 'HC3', 2),
+
+(14, 'MD23', 1),
+(14, 'MD9', 1),
+(14, 'L2', 2),
+(14, 'C3', 1),
+(14, 'HC4', 2),
+
+(15, 'MD23', 1),
+(15, 'S1', 1),
+(15, 'S8', 2),
+(15, 'L5', 1),
+(15, 'HC5', 2),
+
+(16, 'MD23', 1),
+(16, 'MD21', 1),
+(16, 'C1', 1),
+(16, 'C2', 2),
+
+(17, 'MD23', 1),
+(17, 'MD41', 1),
+(17, 'S4', 1),
+(17, 'C3', 1),
+(17, 'C4', 2),
+
+(18, 'MD23', 1),
+(18, 'MD32', 1),
+(18, 'MD33', 1),
+(18, 'L5', 1),
+(18, 'C4', 2),
+(18, 'M1', 1),
+(18, 'M2', 2),
+
+(19, 'MD23', 1),
+(19, 'M1', 1),
+(19, 'M4', 1),
+(19, 'MD29', 1),
+(19, 'M5', 2),
+(19, 'M6', 1),
+(19, 'HD1', 2),
+
+(20, 'MD42', 1),
+(20, 'SK6', 1),
+(20, 'CP1', 1),
+(20, 'CP2', 1),
+(20, 'CP3', 2),
+(20, 'CP4', 1),
+(20, 'CP5', 2),
+
+(21, 'MD1', 2),
+(21, 'MD15', 1),
+(21, 'S3', 2),
+(21, 'S1', 1),
+
+(22, 'MD2', 1),
+(22, 'MD5', 2),
+(22, 'MD16', 1),
+(22, 'S5', 2),
+(22, 'SK2', 1),
+(22, 'HC2', 2),
+
+(23, 'MD9', 1),
+(23, 'MD21', 1),
+(23, 'M6', 1),
+(23, 'SK6', 2),
+(23, 'L9', 1),
+(23, 'HC5', 2),
+
+(24, 'MD23', 1),
+(24, 'HD2', 1),
+(24, 'MD2', 2),
+(24, 'M3', 1),
+(24, 'HC1', 2),
+
+(25, 'MD2', 1),
+(25, 'MD21', 1),
+(25, 'MD8', 2),
+(25, 'L5', 1),
+(25, 'HC5', 2),
+
+(26, 'MD23', 1),
+(26, 'MD21', 1),
+(26, 'C1', 1),
+(26, 'C2', 2),
+
+(27, 'MD23', 1),
+(27, 'MD11', 1),
+(27, 'MD4', 1),
+(27, 'C3', 1),
+(27, 'C4', 2),
+
+(28, 'MD23', 1),
+(28, 'MD22', 1),
+(28, 'M3', 1),
+(28, 'CP5', 1),
+(28, 'SK4', 2),
+(28, 'M1', 1),
+(28, 'MD2', 2),
+
+(29, 'MD23', 1),
+(29, 'M1', 1),
+(29, 'M4', 1),
+(29, 'MD2', 1),
+(29, 'M5', 2),
+(29, 'CP1', 1),
+(29, 'HD1', 2),
+
+(30, 'MD3', 1),
+(30, 'MD6', 1),
+(30, 'MD11', 1),
+(30, 'MD22', 1),
+(30, 'CP3', 2),
+(30, 'CP4', 1),
+(30, 'CP5', 2);
+
+-- Kitchen
+INSERT INTO Kitchen (table_id, item_id, quantity, time_submitted, time_ended)
+VALUES	
+	
+	(6, 'SK3', 4, '2023-10-03 18:45:00', '2023-10-03 18:46:00'),
+	(6, 'CP2', 3, '2023-10-03 18:45:00', '2023-10-03 18:46:00'),
+	(5, 'S3', 5, '2023-10-03 20:00:00', '2023-10-03 20:46:00'), 
+	(5, 'MD15', 2, '2023-10-03 14:45:00', '2023-10-03 14:46:00'),
+	(1, 'MD1', 1, '2023-09-28 22:45:00', '2023-09-28 23:00:00'),
+	(1, 'MD15', 2, '2023-09-28 22:45:00', '2023-09-28 23:00:00'),
+	(1, 'S3', 1, '2023-09-28 22:45:00', '2023-09-28 23:00:00'), 
+	(1, 'L1', 1, '2023-09-28 22:45:00', '2023-09-28 23:00:00'),
+	(5, 'MD2', 1, '2023-09-28 19:00:00', '2023-09-28 19:15:00'),
+	(5, 'MD5', 1, '2023-09-28 19:00:00', '2023-09-28 19:15:00'),
+	(5, 'MD16', 1, '2023-09-28 19:00:00', '2023-09-28 19:15:00'), 
+	(5, 'S5', 1, '2023-09-28 19:00:00', '2023-09-28 19:15:00'),
+	(5, 'L2', 2, '2023-09-28 19:00:00', '2023-09-28 19:15:00'),
+	(5, 'HC2', 1, '2023-09-28 19:00:00', '2023-09-28 19:15:00'),
+	(2, 'MD19', 2, '2023-09-29 22:45:00', '2023-09-29 23:00:00'), 
+	(2, 'MD2', 1, '2023-09-29 22:45:00', '2023-09-29 23:00:00'),
+	(2, 'MD4', 2, '2023-09-29 22:45:00', '2023-09-29 23:00:00'),
+	(2, 'S6', 2, '2023-09-29 22:45:00', '2023-09-29 23:00:00'),
+	(2, 'L3', 1, '2023-09-29 22:45:00', '2023-09-29 23:00:00'), 
+	(2, 'HC3', 1, '2023-09-29 22:45:00', '2023-09-29 23:00:00');
+
+INSERT INTO Kitchen (table_id, item_id, quantity, time_submitted)
+VALUES	
+	(10, 'MD23', 1, '2023-10-06 10:45:00'),
+	(10, 'MD2', 1, '2023-10-06 10:45:00'),
+	(6, 'MD22', 1, '2023-10-06 14:45:00'), 
+	(6, 'CP5', 2, '2023-10-06 14:45:00');
+
+
+

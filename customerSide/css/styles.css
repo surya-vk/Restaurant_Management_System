@@ -1,0 +1,91 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : 29-Oct-2024, 4:18:43 am
+    Author     : gauth
+*/
+.container {
+  max-width: 1200px;
+  margin: auto;
+  padding: 20px;
+}
+
+.projects-header h1 {
+  text-align: center;
+  font-size: 2.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.menu-category {
+  display: block;
+  margin: 1rem auto;
+  padding: 0.5rem;
+  font-size: 1.2rem;
+  text-align: center;
+  max-width: 200px;
+}
+
+.menu-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  justify-content: center;
+  padding-top: 1rem;
+}
+
+.menu-category-content {
+  display: none;
+  flex-basis: 100%;
+}
+
+.menu-category-content h2 {
+  text-align: center;
+  font-size: 1.8rem;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.menu-card {
+  background-color: #fff;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  transition: transform 0.3s, background-color 0.3s;
+  width: 200px;
+}
+
+.menu-card:hover {
+  transform: scale(1.05);
+  background-color: #f9f9f9;
+}
+
+.menu-card strong {
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.menu-card span {
+  font-size: 1rem;
+  color: #888;
+}
+
+.menu-card i {
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.mainDishes .menu-card {
+  background-color: #ffebcc;
+}
+
+.sideDishes .menu-card {
+  background-color: #d0f0c0;
+}
+
+.drinks .menu-card {
+  background-color: #cce0ff;
+}
+
